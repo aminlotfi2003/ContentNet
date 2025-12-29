@@ -35,8 +35,7 @@ public class ArticleConfig : IEntityTypeConfiguration<Article>
             .IsRequired();
 
         builder.Property(x => x.PublishedAt)
-            .HasDefaultValueSql("SYSUTCDATETIME()")
-            .IsRequired();
+            .HasDefaultValueSql("SYSUTCDATETIME()");
 
         builder.Property(x => x.ScheduledAt)
             .HasDefaultValueSql("SYSUTCDATETIME()");

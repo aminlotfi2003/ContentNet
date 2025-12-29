@@ -44,7 +44,7 @@ namespace ContentNet.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
 
-                    b.Property<DateTimeOffset>("PublishedAt")
+                    b.Property<DateTimeOffset?>("PublishedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("SYSUTCDATETIME()");

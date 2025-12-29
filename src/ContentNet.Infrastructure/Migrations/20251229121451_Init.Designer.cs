@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContentNet.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251229114220_Init")]
+    [Migration("20251229121451_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -47,7 +47,7 @@ namespace ContentNet.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
 
-                    b.Property<DateTimeOffset>("PublishedAt")
+                    b.Property<DateTimeOffset?>("PublishedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
