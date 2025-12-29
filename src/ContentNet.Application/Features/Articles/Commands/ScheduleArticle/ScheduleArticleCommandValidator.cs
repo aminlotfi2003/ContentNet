@@ -8,8 +8,8 @@ public class ScheduleArticleCommandValidator : AbstractValidator<ScheduleArticle
     {
         RuleFor(x => x.Id).GreaterThan(0);
 
-        RuleFor(x => x.ScheduledForUtc)
-            .GreaterThan(DateTime.UtcNow)
+        RuleFor(x => x.ScheduledAtUtc)
+            .GreaterThan(DateTimeOffset.UtcNow)
             .WithMessage("Scheduled time must be in the future.");
     }
 }

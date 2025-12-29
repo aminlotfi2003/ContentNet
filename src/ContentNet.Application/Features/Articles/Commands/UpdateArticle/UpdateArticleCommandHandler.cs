@@ -1,56 +1,30 @@
-﻿using ContentNet.Application.Abstractions;
-using ContentNet.Application.Common;
+﻿using ContentNet.Application.Common.Abstractions.Persistence;
+using ContentNet.Application.Common.Exceptions;
+using ContentNet.Domain.Common;
 using MediatR;
 
 namespace ContentNet.Application.Features.Articles.Commands.UpdateArticle;
 
-public class UpdateArticleCommandHandler : IRequestHandler<UpdateArticleCommand, Unit>
+public class UpdateArticleCommandHandler(IDateTimeProvider clock, IArticleRepository repo, IUnitOfWork uow) : IRequestHandler<UpdateArticleCommand, Unit>
 {
-    private readonly IArticleRepository _articleRepository;
-    private readonly ICategoryRepository _categoryRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UpdateArticleCommandHandler(
-        IArticleRepository articleRepository,
-        ICategoryRepository categoryRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _articleRepository = articleRepository;
-        _categoryRepository = categoryRepository;
-        _unitOfWork = unitOfWork;
-    }
+    private readonly IDateTimeProvider _clock = clock;
+    private readonly IArticleRepository _repo = repo;
+    private readonly IUnitOfWork _uow = uow;
 
     public async Task<Unit> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
     {
-        var article = await _articleRepository.GetByIdAsync(request.Id, cancellationToken);
+        var article = await _repo.GetByIdAsync(request.Id, cancellationToken);
         if (article is null)
-            throw new NotFoundException("Article", request.Id);
+            throw new NotFoundException("Article was not found.");
 
-        var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
-        if (category is null)
-            throw new NotFoundException("Category", request.CategoryId);
-
-        article.UpdateContent(
+        article.UpdateArticle(
             request.Title,
             request.Summary,
             request.Content,
-            request.ContentType,
-            request.CategoryId);
+            _clock
+        );
 
-        if (request.TagIds is not null)
-        {
-            foreach (var tag in article.ArticleTags.ToList())
-            {
-                article.RemoveTag(tag.TagId);
-            }
-
-            foreach (var tagId in request.TagIds.Distinct())
-            {
-                article.AddTag(tagId);
-            }
-        }
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _uow.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }
