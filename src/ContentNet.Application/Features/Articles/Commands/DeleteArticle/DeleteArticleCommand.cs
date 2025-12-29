@@ -2,7 +2,4 @@
 
 namespace ContentNet.Application.Features.Articles.Commands.DeleteArticle;
 
-public class DeleteArticleCommand : IRequest<Unit>
-{
-    public int Id { get; set; }
-}
+public record DeleteArticleCommand(int Id) : IRequest<Unit>;

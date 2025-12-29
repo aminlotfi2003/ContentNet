@@ -1,31 +1,25 @@
-﻿using ContentNet.Application.Abstractions;
-using ContentNet.Application.Common;
+﻿using ContentNet.Application.Common.Abstractions.Persistence;
+using ContentNet.Application.Common.Exceptions;
+using ContentNet.Domain.Common;
 using MediatR;
 
 namespace ContentNet.Application.Features.Articles.Commands.ScheduleArticle;
 
-public class ScheduleArticleCommandHandler : IRequestHandler<ScheduleArticleCommand, Unit>
+public class ScheduleArticleCommandHandler(IArticleRepository repo, IUnitOfWork uow, IDateTimeProvider clock) : IRequestHandler<ScheduleArticleCommand, Unit>
 {
-    private readonly IArticleRepository _articleRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public ScheduleArticleCommandHandler(
-        IArticleRepository articleRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _articleRepository = articleRepository;
-        _unitOfWork = unitOfWork;
-    }
+    private readonly IDateTimeProvider _clock = clock;
+    private readonly IArticleRepository _repo = repo;
+    private readonly IUnitOfWork _uow = uow;
 
     public async Task<Unit> Handle(ScheduleArticleCommand request, CancellationToken cancellationToken)
     {
-        var article = await _articleRepository.GetByIdAsync(request.Id, cancellationToken);
+        var article = await _repo.GetByIdAsync(request.Id, cancellationToken);
         if (article is null)
-            throw new NotFoundException("Article", request.Id);
+            throw new NotFoundException("Article was not found.");
 
-        article.SchedulePublication(request.ScheduledForUtc);
+        article.SchedulePublication(request.ScheduledAtUtc, _clock);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _uow.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }
