@@ -19,10 +19,7 @@ public class Article : EntityBase
     public static Article Create(
         string title,
         string summary,
-        string content,
-        ArticleStatus status,
-        DateTimeOffset? publishedAt = null,
-        DateTimeOffset? scheduledAt = null)
+        string content)
     {
         if (string.IsNullOrWhiteSpace(title))
             throw new DomainException("Article title cannot be empty.");
@@ -43,10 +40,7 @@ public class Article : EntityBase
         {
             Title = title,
             Summary = summary,
-            Content = content,
-            Status = status,
-            PublishedAt = publishedAt,
-            ScheduledAt = scheduledAt
+            Content = content
         };
     }
 

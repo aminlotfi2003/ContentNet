@@ -1,7 +1,11 @@
 ﻿using ContentNet.Application.Common.Abstractions.Persistence;
+using ContentNet.Application.Common.Abstractions.Services;
+using ContentNet.Domain.Entities;
 using ContentNet.Infrastructure.Context;
 using ContentNet.Infrastructure.Persistence.Repositories;
 using ContentNet.Infrastructure.Persistence.UnitOfWork;
+using ContentNet.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +34,40 @@ public static class DependencyInjection
 
         // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddIdentity<User, IdentityRole<int>>(options =>
+        {
+            options.User.RequireUniqueEmail = false;
+            options.SignIn.RequireConfirmedPhoneNumber = false;
+            options.Password.RequiredLength = 6;
+            options.Password.RequireNonAlphanumeric = false;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+
+        services.AddScoped<IOtpService, OtpService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<ISmsSenderService, SmsSenderService>();
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = "JwtBearer";
+            options.DefaultChallengeScheme = "JwtBearer";
+        })
+        .AddJwtBearer("JwtBearer", options =>
+        {
+            options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = config["Jwt:Issuer"],
+                ValidAudience = config["Jwt:Audience"],
+                IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                    System.Text.Encoding.UTF8.GetBytes(config["Jwt:Key"]!)
+                )
+            };
+        });
 
         return services;
     }
