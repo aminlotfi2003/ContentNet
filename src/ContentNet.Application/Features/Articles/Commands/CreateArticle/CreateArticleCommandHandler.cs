@@ -19,10 +19,7 @@ public class CreateArticleCommandHandler(IArticleRepository repo, IUnitOfWork uo
         var article = Article.Create(
             request.Title,
             request.Summary,
-            request.Content,
-            request.Status,
-            request.PublishedAt,
-            request.ScheduledAt
+            request.Content
         );
 
         await _repo.AddAsync(article, cancellationToken);

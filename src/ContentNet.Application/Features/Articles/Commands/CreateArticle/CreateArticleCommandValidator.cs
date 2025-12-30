@@ -16,8 +16,5 @@ public class CreateArticleCommandValidator : AbstractValidator<CreateArticleComm
 
         RuleFor(x => x.Content)
             .NotEmpty().WithMessage("Content is required.");
-
-        RuleFor(x => x.Status)
-            .IsInEnum();
     }
 }

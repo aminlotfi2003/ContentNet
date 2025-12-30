@@ -8,12 +8,14 @@ using ContentNet.Application.Features.Articles.Dtos;
 using ContentNet.Application.Features.Articles.Queries.GetArticleDetails;
 using ContentNet.Application.Features.Articles.Queries.GetArticles;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContentNet.Api.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
+[Authorize]
 [Route("api/v{version:apiVersion}/articles")]
 public class ArticleController(IMediator mediator) : ControllerBase
 {

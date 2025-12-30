@@ -23,6 +23,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseExceptionHandling();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
